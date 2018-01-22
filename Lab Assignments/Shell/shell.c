@@ -241,6 +241,15 @@ int ownCmdHandler(char** parsed) {
         cnt = 0;
         return 1;
     case 7:
+        if(cnt-index-1 < 0) {
+            printf("Invalid command\n");
+            return 1;
+        }
+        else if(history[cnt-index-1][0] == '!') {
+            printf("%s\n", history[cnt-index-1]);
+            printf("Addressed command sholudn't iteslf be a '!' prefixed command.\n");
+            return 1;
+        }
         comd = history[cnt-index-1];
         printf("%s\n", comd);
         execFlag = processString(comd,
