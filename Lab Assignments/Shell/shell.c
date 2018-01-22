@@ -6,6 +6,7 @@
 #include<sys/wait.h>
 #include<readline/readline.h>
 #include<readline/history.h>
+#include <regex.h>
  
 #define MAXCOM 1000
 #define MAXLIST 100
@@ -13,6 +14,16 @@
 
 char* history[1000];
 int cnt = 0, i;
+regex_t regex;
+int reti;
+
+void check_regex() {
+    reti = regcomp(&regex, "![0-9]+", REG_EXTENDED);
+    if (reti != 0) {
+        fprintf(stderr, "Could not compile regex\n");
+        exit(1);
+    }
+}
 
 void init_shell() {
     clear();
@@ -57,7 +68,7 @@ void execArgs(char** parsed) {
     } 
     else if (pid == 0) {
         if (execvp(parsed[0], parsed) < 0) {
-            printf("\nCould not execute command..");
+            printf("Could not execute command..\n");
         }
         exit(0);
     } 
@@ -128,59 +139,6 @@ void openHelp() {
     return;
 }
  
-int ownCmdHandler(char** parsed) {
-    int builtinCmds = 6, i, switchArg = 0;
-    char* ListOfBuiltinCmds[builtinCmds];
-    char* username;
- 
-    ListOfBuiltinCmds[0] = "exit";
-    ListOfBuiltinCmds[1] = "cd";
-    ListOfBuiltinCmds[2] = "help";
-    ListOfBuiltinCmds[3] = "hello";
-    ListOfBuiltinCmds[4] = "history";
-    ListOfBuiltinCmds[5] = "clhistory";
- 
-    for (i = 0; i < builtinCmds; i++) {
-        if (strcmp(parsed[0], ListOfBuiltinCmds[i]) == 0) {
-            switchArg = i + 1;
-            break;
-        }
-    }
-    char *user;
-    switch (switchArg) {
-    case 1:
-        user = getenv("USER");
-        printf("Goodbye @%s\n", user);
-        exit(0);
-    case 2:
-        chdir(parsed[1]);
-        return 1;
-    case 3:
-        openHelp();
-        return 1;
-    case 4:
-        username = getenv("USER");
-        printf("\nHello %s.\nThis shell was made by Shreyansh\n",
-            username);
-        return 1;
-    case 5:
-        for(i=0; i<cnt; i++){
-            printf("%d. %s\n", i+1, history[i]);
-        }
-        return 1;
-    case 6:
-        for(i=0; i<cnt; i++){
-            history[i] = NULL;
-        }
-        cnt = 0;
-        return 1;
-    default:
-        break;
-    }
- 
-    return 0;
-}
- 
 int parsePipe(char* str, char** strpiped) {
     int i;
     for (i = 0; i < 2; i++) {
@@ -208,30 +166,101 @@ void parseSpace(char* str, char** parsed) {
             i--;
     }
 }
+
+int processString(char* str, char** parsed, char** parsedpipe);
+
+int ownCmdHandler(char** parsed) {
+    int builtinCmds = 6, i, switchArg = 0, execFlag = 0;
+    char* ListOfBuiltinCmds[builtinCmds];
+    char* username;
+    char* parsedArgsPped[MAXLIST];
+    char *parsedAgs[MAXLIST];
  
-int processString(char* str, char** parsed, char** parsedpipe) {
- 
-    char* strpiped[2];
-    int piped = 0;
- 
-    piped = parsePipe(str, strpiped);
- 
-    if (piped) {
-        parseSpace(strpiped[0], parsed);
-        parseSpace(strpiped[1], parsedpipe);
- 
+    ListOfBuiltinCmds[0] = "exit";
+    ListOfBuiltinCmds[1] = "cd";
+    ListOfBuiltinCmds[2] = "help";
+    ListOfBuiltinCmds[3] = "hello";
+    ListOfBuiltinCmds[4] = "history";
+    ListOfBuiltinCmds[5] = "clhistory";
+
+    for (i = 0; i < builtinCmds; i++) {
+        if (strcmp(parsed[0], ListOfBuiltinCmds[i]) == 0) {
+            switchArg = i + 1;
+            break;
+        }
     }
-    else {
-        parseSpace(str, parsed);
+    int index = 1;
+    char *pEnd;
+    if(switchArg == 0) {
+        char newCmd[10];
+        int l;
+        for(l=0; l<strlen(parsed[0]); l++) {
+            newCmd[l] = parsed[0][l];
+        }
+        char num[30];
+
+        reti = regexec(&regex, parsed[0], 0, NULL, 0);
+        if (!reti) {
+            switchArg = 7;
+            strncpy(num, newCmd+1, strlen(parsed[0])-1);
+            num[strlen(parsed[0])-1] = '\0';
+            index = (int)strtol(num, &pEnd, 10);
+        }
+        else if(strlen(parsed[0]) == 2 && parsed[0][1] == '!') {
+            switchArg = 7;
+            index = 1;
+        }
+    }
+    char *user;
+    char *comd;
+    switch (switchArg) {
+    case 1:
+        user = getenv("USER");
+        printf("Goodbye @%s\n", user);
+        exit(0);
+    case 2:
+        chdir(parsed[1]);
+        return 1;
+    case 3:
+        openHelp();
+        return 1;
+    case 4:
+        username = getenv("USER");
+        printf("\nHello %s.\nThis shell was made by Shreyansh\n",
+            username);
+        return 1;
+    case 5:
+        for(i=0; i<cnt-1; i++){
+            printf("%d. %s\n", cnt-i-1, history[i]);
+        }
+        return 1;
+    case 6:
+        for(i=0; i<cnt; i++){
+            history[i] = NULL;
+        }
+        cnt = 0;
+        return 1;
+    case 7:
+        comd = history[cnt-index-1];
+        printf("%s\n", comd);
+        execFlag = processString(comd,
+        parsedAgs, parsedArgsPped);
+
+        if (execFlag == 1)
+            execArgs(parsedAgs);
+ 
+        if (execFlag == 2)
+            execArgsPiped(parsedAgs, parsedArgsPped);
+        return 1;
+    default:
+        break;
     }
  
-    if (ownCmdHandler(parsed))
-        return 0;
-    else
-        return 1 + piped;
+    return 0;
 }
- 
+
 int main() {
+    check_regex();
     char inputString[MAXCOM], *parsedArgs[MAXLIST];
     char* parsedArgsPiped[MAXLIST];
     int execFlag = 0;
@@ -253,4 +282,25 @@ int main() {
             execArgsPiped(parsedArgs, parsedArgsPiped);
     }
     return 0;
+}
+
+int processString(char* str, char** parsed, char** parsedpipe) {
+ 
+    char* strpiped[2];
+    int piped = 0;
+ 
+    piped = parsePipe(str, strpiped);
+ 
+    if (piped) {
+        parseSpace(strpiped[0], parsed);
+        parseSpace(strpiped[1], parsedpipe);
+    }
+    else {
+        parseSpace(str, parsed);
+    }
+ 
+    if (ownCmdHandler(parsed))
+        return 0;
+    else
+        return 1 + piped;
 }
