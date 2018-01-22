@@ -1,6 +1,8 @@
 Process Tree
 ============
 
+## To compile -   
+* `gcc processtree.c -o processtree -lreadline`
 ## To Run -
 1. Open a terminal and run `./processtree`
 2. Open another terminal
