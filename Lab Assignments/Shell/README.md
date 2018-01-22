@@ -6,6 +6,7 @@ A simple shell. Build in commands include-
 2. ls
 3. history
 4. clhistory(custom command)
-5. exit
+5. !! (To execute last command) or !N to execute the Nth last command
+6. exit
 
 Other than these the shell also supports **piping** and other standard **UNIX commands**.
