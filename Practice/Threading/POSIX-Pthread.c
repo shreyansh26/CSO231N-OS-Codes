@@ -1,3 +1,5 @@
+/* usage - gcc -pthread POSIX-Pthread.c -o POSIX-Pthread */
+
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
