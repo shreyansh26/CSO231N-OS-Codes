@@ -9,6 +9,7 @@ int i;
 void *runn(void *arg);
 
 int main(int argc, char *argv[]) {
+    clock_t begin = clock();
     if (argc != 2) {
         printf("format is:./a.out <intgervalue>\n");
         return -1;
@@ -38,6 +39,9 @@ int main(int argc, char *argv[]) {
         printf("%d ", fibseq[k]);
     }
     printf("\n");
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Time: %lf\n", time_spent);
     return 0;
 }
 
@@ -56,7 +60,6 @@ void *runn(void *arg) {
         int p, pp, fibp, fibpp;
 
         fibseq[i] = fibseq[i - 1] + fibseq[i - 2];
-        // printf("fibseq[%d]%d,\n",i,fibseq[i]);
         pthread_exit(0);        
     }
 }

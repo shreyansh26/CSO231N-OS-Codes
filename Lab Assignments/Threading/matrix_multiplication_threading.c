@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX 2
+int MAX;
 
 #define MAX_THREAD 4
  
-int matA[MAX][MAX];
-int matB[MAX][MAX];
-int matC[MAX][MAX];
+int matA[100][100];
+int matB[100][100];
+int matC[100][100];
 int step_i = 0;
  
 void* multiply(void* arg) {
@@ -22,8 +22,14 @@ void* multiply(void* arg) {
                 matC[i][j] += matA[i][k] * matB[k][j];
 }
  
-int main() {
-
+int main(int argc, char *argv[]) {
+    clock_t begin = clock();
+    if (argc != 2) {
+        printf("format is:./a.out <intgervalue>\n");
+        return -1;
+    }
+    
+    MAX = atoi(argv[1]);
     int i, j, k;
     srand(time(NULL)); 
     for (i = 0; i < MAX; i++) {
@@ -34,26 +40,25 @@ int main() {
     }
  
     
-    printf("\nMatrix A\n");
-    for (i = 0; i < MAX; i++) {
-        for (j = 0; j < MAX; j++) 
-            printf("%d ", matA[i][j]);
-        printf("\n");
-    }
+    // printf("\nMatrix A\n");
+    // for (i = 0; i < MAX; i++) {
+    //     for (j = 0; j < MAX; j++) 
+    //         printf("%d ", matA[i][j]);
+    //     printf("\n");
+    // }
  
 
-    printf("\nMatrix B\n");
-    for (i = 0; i < MAX; i++) {
-        for (j = 0; j < MAX; j++) 
-            printf("%d ", matB[i][j]);
-        printf("\n");
-    }
+    // printf("\nMatrix B\n");
+    // for (i = 0; i < MAX; i++) {
+    //     for (j = 0; j < MAX; j++) 
+    //         printf("%d ", matB[i][j]);
+    //     printf("\n");
+    // }
  
     pthread_t threads[MAX_THREAD];
     pthread_attr_t attr;
 
-    int chk = pthread_attr_init(&attr);
-    printf("%d\n", chk);
+    pthread_attr_init(&attr);
  
     for (i = 0; i < MAX_THREAD; i++) {
         int* p;
@@ -69,5 +74,8 @@ int main() {
             printf("%d ", matC[i][j]);      
         printf("\n");
     }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Time: %lf\n", time_spent);
     return 0;
 }
