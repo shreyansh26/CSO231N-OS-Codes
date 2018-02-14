@@ -85,8 +85,7 @@ void findavgTime(Process proc[], int n) {
     cout<<endl;
 }
 
-int main()
-{
+int main() {
     Process proc[] = { { 1, 6, 1 }, { 2, 8, 1 },
                     { 3, 7, 2 }, { 4, 3, 3 } };
     int n = sizeof(proc) / sizeof(proc[0]);
