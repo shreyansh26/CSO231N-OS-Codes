@@ -5,11 +5,11 @@
 
 int MAX;
 
-#define MAX_THREAD 4
+#define MAX_THREAD 16
  
-int matA[100][100];
-int matB[100][100];
-int matC[100][100];
+int matA[1005][1005];
+int matB[1005][1005];
+int matC[1005][1005];
 int step_i = 0;
  
 void* multiply(void* arg) {
@@ -40,20 +40,20 @@ int main(int argc, char *argv[]) {
     }
  
     
-    // printf("\nMatrix A\n");
-    // for (i = 0; i < MAX; i++) {
-    //     for (j = 0; j < MAX; j++) 
-    //         printf("%d ", matA[i][j]);
-    //     printf("\n");
-    // }
+    printf("\nMatrix A\n");
+    for (i = 0; i < MAX; i++) {
+        for (j = 0; j < MAX; j++) 
+            printf("%d ", matA[i][j]);
+        printf("\n");
+    }
  
 
-    // printf("\nMatrix B\n");
-    // for (i = 0; i < MAX; i++) {
-    //     for (j = 0; j < MAX; j++) 
-    //         printf("%d ", matB[i][j]);
-    //     printf("\n");
-    // }
+    printf("\nMatrix B\n");
+    for (i = 0; i < MAX; i++) {
+        for (j = 0; j < MAX; j++) 
+            printf("%d ", matB[i][j]);
+        printf("\n");
+    }
  
     pthread_t threads[MAX_THREAD];
     pthread_attr_t attr;
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
         pthread_create(&threads[i], &attr, multiply, (void*)(p));
     }
  
-    for (i = 0; i < MAX_THREAD; i++) 
-        pthread_join(threads[i], NULL);    
+    //for (i = 0; i < MAX_THREAD; i++) 
+        //pthread_join(threads[i], NULL);    
  
     printf("\nMultiplication of A and B\n");
     for (i = 0; i < MAX; i++) {

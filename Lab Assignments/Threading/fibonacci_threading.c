@@ -57,8 +57,6 @@ void *runn(void *arg) {
     }
     else {
 
-        int p, pp, fibp, fibpp;
-
         fibseq[i] = fibseq[i - 1] + fibseq[i - 2];
         pthread_exit(0);        
     }
