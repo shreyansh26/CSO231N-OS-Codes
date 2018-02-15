@@ -13,7 +13,7 @@ bool comparison(Process a, Process b) {
 void findWaitingTime(Process proc[], int n, int wt[]) {
     wt[0] = 0;
 
-    for (int i = 1; i < n ; i++ )
+    for (int i = 1; i<n ; i++ )
         wt[i] = proc[i-1].bt + wt[i-1] ;
 }
 

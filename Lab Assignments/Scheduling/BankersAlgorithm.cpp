@@ -2,12 +2,11 @@
 using namespace std;
 
 const int P = 5;
-
 const int R = 3;
 
 void calculateNeed(int need[P][R], int maxm[P][R], int allot[P][R]) {
-    for (int i = 0 ; i < P ; i++)
-        for (int j = 0 ; j < R ; j++)
+    for (int i=0; i<P; i++)
+        for (int j=0; j<R; j++)
             need[i][j] = maxm[i][j] - allot[i][j];
 }
  
@@ -46,7 +45,7 @@ bool isSafe(int processes[], int avail[], int maxm[][R], int allot[][R]) {
         }
  
         if (found == false) {
-            cout << "System is not in safe state";
+            cout<<"System is not in safe state";
             return false;
         }
     }
